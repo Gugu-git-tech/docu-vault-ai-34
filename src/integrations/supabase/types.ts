@@ -14,16 +14,253 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          details: string | null
+          document_id: string | null
+          id: string
+          new_status: string | null
+          previous_status: string | null
+          stage: number | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: string | null
+          document_id?: string | null
+          id?: string
+          new_status?: string | null
+          previous_status?: string | null
+          stage?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: string | null
+          document_id?: string | null
+          id?: string
+          new_status?: string | null
+          previous_status?: string | null
+          stage?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_approvals: {
+        Row: {
+          action: string
+          actor_id: string
+          actor_role: Database["public"]["Enums"]["app_role"]
+          created_at: string
+          document_id: string
+          id: string
+          reason: string | null
+          stage: number
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          actor_role: Database["public"]["Enums"]["app_role"]
+          created_at?: string
+          document_id: string
+          id?: string
+          reason?: string | null
+          stage: number
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          actor_role?: Database["public"]["Enums"]["app_role"]
+          created_at?: string
+          document_id?: string
+          id?: string
+          reason?: string | null
+          stage?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_approvals_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documents: {
+        Row: {
+          created_at: string
+          currency: string | null
+          current_stage: number
+          doc_date: string | null
+          doc_type: Database["public"]["Enums"]["doc_type"] | null
+          duplicate_of: string | null
+          duplicate_reason: string | null
+          extraction_confidence: number | null
+          extraction_error: string | null
+          file_hash: string | null
+          file_name: string
+          file_path: string
+          file_size: number
+          id: string
+          invoice_number: string | null
+          mime_type: string
+          raw_extraction: Json | null
+          status: Database["public"]["Enums"]["doc_status"]
+          subtotal: number | null
+          total_amount: number | null
+          updated_at: string
+          uploaded_by: string
+          validation_issues: Json
+          vat_amount: number | null
+          vendor: string | null
+        }
+        Insert: {
+          created_at?: string
+          currency?: string | null
+          current_stage?: number
+          doc_date?: string | null
+          doc_type?: Database["public"]["Enums"]["doc_type"] | null
+          duplicate_of?: string | null
+          duplicate_reason?: string | null
+          extraction_confidence?: number | null
+          extraction_error?: string | null
+          file_hash?: string | null
+          file_name: string
+          file_path: string
+          file_size: number
+          id?: string
+          invoice_number?: string | null
+          mime_type: string
+          raw_extraction?: Json | null
+          status?: Database["public"]["Enums"]["doc_status"]
+          subtotal?: number | null
+          total_amount?: number | null
+          updated_at?: string
+          uploaded_by: string
+          validation_issues?: Json
+          vat_amount?: number | null
+          vendor?: string | null
+        }
+        Update: {
+          created_at?: string
+          currency?: string | null
+          current_stage?: number
+          doc_date?: string | null
+          doc_type?: Database["public"]["Enums"]["doc_type"] | null
+          duplicate_of?: string | null
+          duplicate_reason?: string | null
+          extraction_confidence?: number | null
+          extraction_error?: string | null
+          file_hash?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number
+          id?: string
+          invoice_number?: string | null
+          mime_type?: string
+          raw_extraction?: Json | null
+          status?: Database["public"]["Enums"]["doc_status"]
+          subtotal?: number | null
+          total_amount?: number | null
+          updated_at?: string
+          uploaded_by?: string
+          validation_issues?: Json
+          vat_amount?: number | null
+          vendor?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_duplicate_of_fkey"
+            columns: ["duplicate_of"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string | null
+          id: string
+          last_activity: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name?: string | null
+          id: string
+          last_activity?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string | null
+          id?: string
+          last_activity?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "approver" | "viewer"
+      doc_status:
+        | "processing"
+        | "pending"
+        | "approved"
+        | "rejected"
+        | "duplicate"
+      doc_type: "invoice" | "credit_note"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +387,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "approver", "viewer"],
+      doc_status: [
+        "processing",
+        "pending",
+        "approved",
+        "rejected",
+        "duplicate",
+      ],
+      doc_type: ["invoice", "credit_note"],
+    },
   },
 } as const
