@@ -67,7 +67,7 @@ function AuthPage() {
         });
         if (signInError) throw signInError;
       } else {
-        const { error: signUpError } = await supabase.auth.signUp({
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email: email.trim(),
           password,
           options: {
@@ -76,13 +76,15 @@ function AuthPage() {
           },
         });
         if (signUpError) throw signUpError;
-        const { error: afterSignUp } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password,
-        });
-        if (afterSignUp) {
-          toast.success("Account created. Confirm your email address, then sign in.");
+        if (!signUpData.session) {
+          toast.success("Account created. Check your inbox and confirm your email address.");
+          setError(
+            "We sent a confirmation link to " +
+              email.trim() +
+              ". Open it to activate your account, then sign in here.",
+          );
           setMode("signin");
+          setPassword("");
           setLoading(false);
           return;
         }
