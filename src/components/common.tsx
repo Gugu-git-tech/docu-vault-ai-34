@@ -152,7 +152,13 @@ export function EmptyState({
   );
 }
 
-export function ErrorState({ message, retry }: { message?: string; retry?: () => void }) {
+export function ErrorState({
+  message,
+  retry,
+}: {
+  message?: string | undefined;
+  retry?: (() => void) | undefined;
+}) {
   return (
     <div
       className="flex min-h-40 flex-col items-center justify-center gap-3 rounded-2xl border border-destructive/30 bg-destructive/5 p-8 text-center"
