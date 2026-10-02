@@ -1,6 +1,10 @@
 // Server-only Lovable AI Gateway helper. Never imported by client code.
+// Falls back to a user-supplied OpenAI key (OPENAI_API_KEY) when the project
+// is self-hosted (e.g. Cloudflare) and LOVABLE_API_KEY is unavailable.
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 const MODEL = "openai/gpt-6-astra";
+const FALLBACK_MODEL = "gpt-4o";
 
 export type ChatContent =
   | { type: "text"; text: string }
@@ -31,18 +35,20 @@ export async function aiJson<T>(args: {
   schema: Record<string, unknown>;
 }): Promise<T> {
   const apiKey = process.env["LOVABLE_API_KEY"];
-  if (!apiKey) throw new AiGatewayError(401, "AI is not configured for this project.");
+  const openAiKey = process.env["OPENAI_API_KEY"];
+  if (!apiKey && !openAiKey)
+    throw new AiGatewayError(401, "AI is not configured for this project.");
 
-  const res = await fetch(GATEWAY_URL, {
+  const useGateway = Boolean(apiKey);
+  const res = await fetch(useGateway ? GATEWAY_URL : OPENAI_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${useGateway ? apiKey : openAiKey}`,
     },
     body: JSON.stringify({
-      model: MODEL,
-      reasoning_effort: "low",
-      max_completion_tokens: 4000,
+      model: useGateway ? MODEL : FALLBACK_MODEL,
+      ...(useGateway ? { reasoning_effort: "low" } : {}),
       messages: [
         { role: "system", content: args.system },
         { role: "user", content: args.content },
