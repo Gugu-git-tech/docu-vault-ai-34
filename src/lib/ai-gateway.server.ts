@@ -1,6 +1,10 @@
 // Server-only Lovable AI Gateway helper. Never imported by client code.
+// Falls back to a user-supplied OpenAI key (OPENAI_API_KEY) when the project
+// is self-hosted (e.g. Cloudflare) and LOVABLE_API_KEY is unavailable.
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 const MODEL = "openai/gpt-6-astra";
+const FALLBACK_MODEL = "gpt-4o";
 
 export type ChatContent =
   | { type: "text"; text: string }
